@@ -66,3 +66,51 @@ function toggleMoney() {
         document.getElementById("money-heading").innerText = "Money ▲";
     moneyToggleFlag = !moneyToggleFlag;
 }
+
+function addEntryRow(name, bank, onkeyup, parent) {
+    let html = "<span>\
+                    <div>\
+                        <h3>" + name + "</h3>\
+                        <p>" + bank + "</p>\
+                    </div>\
+                    <input type='number' step='0.01' onkeyup='" + onkeyup + "'>\
+                </span>";
+
+    document.getElementById(parent).innerHTML += html;
+}
+
+function addTotalRow(id, parent) {
+    let html = "<span>\
+                    <div>\
+                        <h3>Total</h3>\
+                    </div>\
+                    <p id='" + id + "'>$0.00</p>\
+                </span>";
+    
+    document.getElementById(parent).innerHTML += html;
+}
+
+function addMoneyRow(name, bank) {
+    addEntryRow(name, bank, "updateMoney()", "money");
+}
+
+function addCreditCardsRow(name, bank) {
+    addEntryRow(name, bank, "updateCreditCards()", "credit-cards");
+}
+
+addMoneyRow("Checking", "Manhattan Bank");
+addMoneyRow("Checking", "Cash App");
+addMoneyRow("Cash", "& etc.");
+addTotalRow("money-total", "money");
+
+addCreditCardsRow("Blue Cash Preferred", "American Express");
+addCreditCardsRow("Hilton Honors", "American Express");
+addCreditCardsRow("Bread Cashback", "Bread Financial");
+addCreditCardsRow("Walmart Rewards", "Capital One");
+addCreditCardsRow("Amazon Prime", "Chase");
+addCreditCardsRow("Costco Anywhere", "Citi");
+addCreditCardsRow("Custom Cash", "Citi");
+addCreditCardsRow("Student Cash Back", "Discover");
+addCreditCardsRow("Kroger Rewards", "U.S. Bank");
+addCreditCardsRow("Apple Card", "Apple");
+addTotalRow("credit-card-total", "credit-cards");

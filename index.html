@@ -2,7 +2,6 @@
 <html>
     <head>
         <title>Current Balance</title>
-        <script src="main.js"></script>
         <link rel="stylesheet" href="style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
     </head>
@@ -12,114 +11,15 @@
 
         <section id="money">
             <h2 id="money-heading" onclick="toggleMoney()">Money ▲</h2>
-            <span>
-                <div>
-                    <h3>Checking</h3>
-                    <p>Manhattan Bank</p>
-                </div>
-                <input type="number" step="0.01" onkeyup="updateMoney()">
-            </span>
-            <span>
-                <div>
-                    <h3>Checking</h3>
-                    <p>Cash App</p>
-                </div>
-                <input type="number" step="0.01" onkeyup="updateMoney()">
-            </span>
-            <span>
-                <div>
-                    <h3>Cash</h3>
-                </div>
-                <input type="number" step="0.01" onkeyup="updateMoney()">
-            </span>
-            <span>
-                <div>
-                    <h3>Total</h3>
-                </div>
-                <p id="money-total">$0.00</p>
-            </span>
         </section>
 
         <section id="credit-cards">
             <h2 id="credit-cards-heading" onclick="toggleCreditCards()">Credit Cards ▲</h2>
-            <span>
-                <div>
-                    <h3>Blue Cash Preferred</h3>
-                    <p>American Express</p>
-                </div>
-                <input id="blue-cash-preferred" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Hilton Honors</h3>
-                    <p>American Express</p>
-                </div>
-                <input id="hilton-honors" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Bread Cashback</h3>
-                    <p>Bread Financial</p>
-                </div>
-                <input id="bread-cashback" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Walmart Rewards</h3>
-                    <p>Capital One</p>
-                </div>
-                <input id="walmart-rewards" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Amazon Prime</h3>
-                    <p>Chase</p>
-                </div>
-                <input id="amazon-prime" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Costco Anywhere</h3>
-                    <p>Citi</p>
-                </div>
-                <input id="costco-anywhere" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Custom Cash</h3>
-                    <p>Citi</p>
-                </div>
-                <input id="custom-cash" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Student Cash Back</h3>
-                    <p>Discover</p>
-                </div>
-                <input id="student-cash-back" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Kroger Rewards</h3>
-                    <p>U.S. Bank</p>
-                </div>
-                <input id="kroger-rewards" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Apple Card</h3>
-                    <p>Apple</p>
-                </div>
-                <input id="apple-card" type="number" step="0.01" onkeyup="updateCreditCards()">
-            </span>
-            <span>
-                <div>
-                    <h3>Total</h3>
-                </div>
-                <p id="credit-card-total">$0.00</p>
-            </span>
         </section>
+        
         <h2>Current Balance</h2>
         <p id="current-balance-holder"><em id="current-balance">$0.00</em></p>
+        
+        <script src="main.js"></script>
     </body>
 </html>
