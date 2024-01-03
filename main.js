@@ -1,69 +1,73 @@
 let creditCardBalance = 0;
 let moneyBalance = 0;
 
-function updateCreditCards() {
-    let creditCards = document.getElementById("credit-cards");
-    let total = 0.0;
-    for(let i = 1; i < creditCards.children.length - 1; i++) {
-        let cardValue = creditCards.children[i].children[1].value;
-        if(typeof (cardValue-0) === "number") total += (cardValue-0);
-    }
-    total = Math.round(100*total) / 100;
-    let totalText = "$" + total;
-    if(total == ~~(total)) totalText += ".00";
-    else if(10*total == ~~(10*total)) totalText += "0";
-    document.getElementById("credit-card-total").innerText = totalText;
-    creditCardBalance = total;
-    document.getElementById("current-balance").innerText = moneyBalance - creditCardBalance;
+let creditCardsValues;
+let moneyValues;
+
+function numberWrap(n) {
+    if(!isNaN(n-0)) return (n-0);
+    else return 0;
 }
 
-let creditCardToggleFlag = true;
-function toggleCreditCards() {
-    let creditCards = document.getElementById("credit-cards");
-    for(let i = 1; i < creditCards.children.length - 1; i++) {
-        if(creditCardToggleFlag)
-            creditCards.children[i].style.display = "none";
+function floatToUSD(f) {
+    f = Math.round(100*f) / 100;
+    let usd = "$" + f;
+    if(f === ~~f) usd += ".00";
+    else if (10*f === ~~(10*f)) usd += "0";
+
+    return usd;
+}
+
+function updateTotal(id) {
+    let section = document.getElementById(id);
+    let total = 0.0;
+    for(let i = 1; i < section.children.length - 1; i++) {
+        let value = section.children[i].children[1].value;
+        total += numberWrap(value);
+        if(id === "credit-cards") creditCardsValues[i-1] = numberWrap(value);
+        else if(id === "money") moneyValues[i-1] = numberWrap(value);
+    }
+    document.getElementById(id + "-total").innerText = floatToUSD(total);
+    if(id === "credit-cards") {
+        creditCardBalance = total;
+        creditCardsValues[creditCardsValues.length - 2] = total;
+        localStorage.setItem("credit-cards-values", creditCardsValues);
+    }
+    else if(id === "money") {
+        moneyBalance = total;
+        moneyValues[moneyValues.length - 2] = total;
+        localStorage.setItem("money-values", moneyValues);
+    }
+    document.getElementById("current-balance").innerText = floatToUSD(moneyBalance - creditCardBalance);
+}
+
+function toggleSection(flag, id, label) {
+    let section = document.getElementById(id);
+    for(let i = 1; i < section.children.length - 1; i++) {
+        if(flag)
+            section.children[i].style.display = "none";
         else
-            creditCards.children[i].style.display = "inline-flex";
+            section.children[i].style.display = "inline-flex";
     }
 
-    if(creditCardToggleFlag) 
-        document.getElementById("credit-cards-heading").innerText = "Credit Cards ▼";
+    let heading = document.getElementById(id + "-heading");
+    if(flag) 
+        heading.innerText = label + " ▼";
     else 
-        document.getElementById("credit-cards-heading").innerText = "Credit Cards ▲";
-    creditCardToggleFlag = !creditCardToggleFlag;
+        heading.innerText = label + " ▲";
 }
 
-function updateMoney() {
-    let money = document.getElementById("money");
-    let total = 0.0;
-    for(let i = 1; i < money.children.length - 1; i++) {
-        let cashValue = money.children[i].children[1].value;
-        if(typeof (cashValue-0) === "number") total += (cashValue-0);
-    }
-    total = Math.round(100*total) / 100;
-    let totalText = "$" + total;
-    if(total == ~~(total)) totalText += ".00";
-    else if(10*total == ~~(10*total)) totalText += "0";
-    document.getElementById("money-total").innerText = totalText;
-    moneyBalance = total;
-    document.getElementById("current-balance").innerText = moneyBalance - creditCardBalance;
+let creditCardsToggleFlag = true;
+function toggleCreditCards() {
+    toggleSection(creditCardsToggleFlag, "credit-cards", "Credit Cards");
+    
+    creditCardsToggleFlag = !creditCardsToggleFlag;
 }
 
 let moneyToggleFlag = true;
 function toggleMoney() {
-    let money = document.getElementById("money");
-    for(let i = 1; i < money.children.length - 1; i++) {
-        if(moneyToggleFlag)
-            money.children[i].style.display = "none";
-        else
-            money.children[i].style.display = "inline-flex";
-    }
+    toggleSection(moneyToggleFlag, "money", "Money");
 
-    if(moneyToggleFlag) 
-        document.getElementById("money-heading").innerText = "Money ▼";
-    else 
-        document.getElementById("money-heading").innerText = "Money ▲";
     moneyToggleFlag = !moneyToggleFlag;
 }
 
@@ -91,11 +95,11 @@ function addTotalRow(id, parent) {
 }
 
 function addMoneyRow(name, bank) {
-    addEntryRow(name, bank, "updateMoney()", "money");
+    addEntryRow(name, bank, 'updateTotal("money")', "money");
 }
 
 function addCreditCardsRow(name, bank) {
-    addEntryRow(name, bank, "updateCreditCards()", "credit-cards");
+    addEntryRow(name, bank, 'updateTotal("credit-cards")', "credit-cards");
 }
 
 addMoneyRow("Checking", "Manhattan Bank");
@@ -113,4 +117,22 @@ addCreditCardsRow("Custom Cash", "Citi");
 addCreditCardsRow("Student Cash Back", "Discover");
 addCreditCardsRow("Kroger Rewards", "U.S. Bank");
 addCreditCardsRow("Apple Card", "Apple");
-addTotalRow("credit-card-total", "credit-cards");
+addTotalRow("credit-cards-total", "credit-cards");
+
+moneyValues = localStorage.getItem("money-values");
+if(moneyValues === null) moneyValues = new Array(4, 0);
+creditCardsValues = localStorage.getItem("credit-cards-values");
+if(creditCardsValues === null) creditCardsValues = new Array(11, 0);
+
+let moneySection = document.getElementById("money");
+for(let i = 1; i < moneySection.children.length - 1; i++) {
+    moneySection.children[i].children[1].value = moneyValues[i-1];
+}
+
+let creditCardsSection = document.getElementById("credit-cards");
+for(let i = 1; i < creditCardsSection.children.length - 1; i++) {
+    creditCardsSection.children[i].children[1].value = creditCardsValues[i-1];
+}
+
+updateTotal("credit-cards");
+updateTotal("money");
