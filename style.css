@@ -6,12 +6,25 @@
 }
 
 h1 {
-    padding: 2rem;
+    font-size: 2rem;
+    padding: 2rem 2rem 2rem 2rem;
+    
 }
-h2, span, #current-balance-holder {
-    padding-bottom: 2rem;
-    padding-right: 2rem;
-    padding-left: 2rem;
+#title-section {
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.4);
+
+    position: fixed;
+    background-color: white;
+    width: 100%;
+
+    border-radius: 0rem 0rem 1rem 1rem;
+}
+h2, span {
+    padding: 1rem 2rem 1rem 2rem;
+}
+
+#current-balance-holder {
+    padding: 0rem 2rem 1rem 2rem;
 }
 
 span {
@@ -24,8 +37,28 @@ span {
 input {
     padding: 0.5rem;
     width: 25%;
+    font-size: 1rem;
 }
 
 #current-balance {
     font-size: 1.5rem;
+}
+
+#current-balance-section {
+    width: 100%;
+    position: fixed;
+    bottom: 0;
+
+    background-color: white;
+
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.4);
+
+    border-radius: 1rem 1rem 0rem 0rem;
+}
+
+#money {
+    padding-top: 7rem;
+}
+#credit-cards {
+    padding-bottom: 7rem;
 }

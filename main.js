@@ -30,12 +30,12 @@ function updateTotal(id) {
     document.getElementById(id + "-total").innerText = floatToUSD(total);
     if(id === "credit-cards") {
         creditCardBalance = total;
-        creditCardsValues[creditCardsValues.length - 2] = total;
+
         localStorage.setItem("credit-cards-values", creditCardsValues);
     }
     else if(id === "money") {
         moneyBalance = total;
-        moneyValues[moneyValues.length - 2] = total;
+
         localStorage.setItem("money-values", moneyValues);
     }
     document.getElementById("current-balance").innerText = floatToUSD(moneyBalance - creditCardBalance);
@@ -120,18 +120,23 @@ addCreditCardsRow("Apple Card", "Apple");
 addTotalRow("credit-cards-total", "credit-cards");
 
 moneyValues = localStorage.getItem("money-values");
-if(moneyValues === null) moneyValues = new Array(4, 0);
+if(moneyValues === null) moneyValues = new Array(3).fill(0);
+else moneyValues = moneyValues.split(",");
+
 creditCardsValues = localStorage.getItem("credit-cards-values");
-if(creditCardsValues === null) creditCardsValues = new Array(11, 0);
+if(creditCardsValues === null) creditCardsValues = new Array(10).fill(0);
+else creditCardsValues = creditCardsValues.split(",");
+
+console.log(moneyValues)
 
 let moneySection = document.getElementById("money");
 for(let i = 1; i < moneySection.children.length - 1; i++) {
-    moneySection.children[i].children[1].value = moneyValues[i-1];
+    if(moneyValues[i-1] != 0) moneySection.children[i].children[1].value = moneyValues[i-1];
 }
 
 let creditCardsSection = document.getElementById("credit-cards");
 for(let i = 1; i < creditCardsSection.children.length - 1; i++) {
-    creditCardsSection.children[i].children[1].value = creditCardsValues[i-1];
+    if(creditCardsValues[i-1] != 0) creditCardsSection.children[i].children[1].value = creditCardsValues[i-1];
 }
 
 updateTotal("credit-cards");
