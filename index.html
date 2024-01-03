@@ -4,6 +4,32 @@
         <title>Current Balance</title>
         <link rel="stylesheet" href="style.css">
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
+        <meta name="theme-color" content="black">
+        
+        <!-- Manifest File link -->
+        <link rel="manifest" href="manifest.webmanifest">
+
+        <script>
+            window.addEventListener('load', () => {
+                registerSW();
+            });
+
+            // Register the Service Worker
+            async function registerSW() {
+                if ('serviceWorker' in navigator) {
+                    try {
+                        await navigator
+                            .serviceWorker
+                            .register('serviceworker.js');
+                    }
+                    catch (e) {
+                        console.log('SW registration failed');
+                    }
+                }
+            }
+        </script>
     </head>
 
     <body>
