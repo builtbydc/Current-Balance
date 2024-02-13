@@ -19,25 +19,71 @@ h1 {
 
     border-radius: 0rem 0rem 1rem 1rem;
 }
-h2, span {
+h2, .entry {
     padding: 1rem 2rem 1rem 2rem;
 }
 
 #current-balance-holder {
     padding: 0rem 2rem 1rem 2rem;
 }
+.entry {
+    width: calc(100% - 4rem);
+}
 
 span {
-    width: calc(100% - 4rem);
-    display: inline-flex;
+    display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.entry-detail {
+    padding: 0.5rem 1rem 0.5rem 1rem;
+}
+
+.heading-row {
+    width: calc(100% - 2rem);
+}
+
+.plus {
+    border: none;
+    background: none;
+    color: blue;
+    font-size: 2rem;
+    padding-bottom: 0.2rem;
+}
+
+.close {
+    width: 8rem;
+    margin: 0.5rem 0 0.5rem 0;
+    padding: 0.5rem;
+    font-weight: bold;
+    font-size: 1rem;
+}
+
+dialog {
+    position: fixed;
+    width: 80%;
+    left:10%;
+    top: calc(50% - 5rem);
+    padding: 0.5rem 0 0.5rem 0;
+
+    border-radius: 1rem;
+}
+
+dialog > div {
+    width: 100%;
+    display: flex;
+    justify-content: space-evenly;
 }
 
 input {
     padding: 0.5rem;
     width: 25%;
     font-size: 1rem;
+}
+
+dialog > span > input {
+    width: calc(50% - 1rem);
 }
 
 #current-balance {

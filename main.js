@@ -1,143 +1,252 @@
-let creditCardBalance = 0;
-let moneyBalance = 0;
+let MONEY_SECTION_ID = "money";
+let CREDIT_CARDS_SECTION_ID = "credit-cards";
 
-let creditCardsValues;
-let moneyValues;
+function 
+forceNumber(val) 
+{
+    let n = val - 0;
+    // (val - 0) is either a number or NaN
 
-function numberWrap(n) {
-    if(!isNaN(n-0)) return (n-0);
-    else return 0;
+    return isNaN(n) ? 0 : n;
 }
 
-function floatToUSD(f) {
-    f = Math.round(100*f) / 100;
-    let usd = "$" + f;
-    if(f === ~~f) usd += ".00";
-    else if (10*f === ~~(10*f)) usd += "0";
+function 
+numberToUSD(val) 
+{
+    let cents = Math.round(100*val) + ""; 
+    if(cents.length === 1) {
+        cents = "00" + cents;
+    } else if(cents.length === 2) {
+        cents = "0" + cents;
+    }
+    // cents is now number of cents as string
+    let usd = "$" + cents.substring(0, cents.length - 2) + "." +
+              cents.substring(cents.length - 2);
 
     return usd;
 }
 
-function updateTotal(id) {
-    let section = document.getElementById(id);
-    let total = 0.0;
-    for(let i = 1; i < section.children.length - 1; i++) {
-        let value = section.children[i].children[1].value;
-        total += numberWrap(value);
-        if(id === "credit-cards") creditCardsValues[i-1] = numberWrap(value);
-        else if(id === "money") moneyValues[i-1] = numberWrap(value);
-    }
-    document.getElementById(id + "-total").innerText = floatToUSD(total);
-    if(id === "credit-cards") {
-        creditCardBalance = total;
-
-        localStorage.setItem("credit-cards-values", creditCardsValues);
-    }
-    else if(id === "money") {
-        moneyBalance = total;
-
-        localStorage.setItem("money-values", moneyValues);
-    }
-    document.getElementById("current-balance").innerText = floatToUSD(moneyBalance - creditCardBalance);
+function
+USDToNumber(val) 
+{
+    // always will be a number
+    return val.substring(1) - 0;
 }
 
-function toggleSection(flag, id, label) {
+function 
+updateTotal(id) 
+{
     let section = document.getElementById(id);
-    for(let i = 1; i < section.children.length - 1; i++) {
-        if(flag)
-            section.children[i].style.display = "none";
-        else
-            section.children[i].style.display = "inline-flex";
+    let entries = section.children;
+    let indexOfTotalRow = section.children.length - 1;
+
+    let valueList = [];
+    let storageID = id;
+
+    let total = 0.0;
+    for(let i = 1; i < indexOfTotalRow; i++) {
+        // index 0 is the heading, skip it
+        //stop before the total row
+
+        let val = entries[i].children[1].value;
+        // children[1] is the input field
+        
+        total += forceNumber(val);
+
+        valueList.push(forceNumber(val));
+    }
+
+    document.getElementById(id + "-total").innerText = numberToUSD(total);
+    updateCurrentBalance();
+
+    localStorage.setItem(storageID, valueList);
+    
+    return total;
+}
+
+function
+updateCurrentBalance() 
+{
+    let moneyTotal = USDToNumber(document.getElementById("money-total").innerText);
+    let creditCardTotal = USDToNumber(document.getElementById("credit-cards-total").innerText);
+
+    document.getElementById("current-balance").innerText = numberToUSD(moneyTotal - creditCardTotal);
+}
+
+function 
+toggleSection(id) 
+{
+    let section = document.getElementById(id);
+    let entries = section.children;
+    let indexOfTotalRow = section.children.length - 1;
+
+    let flag = entries[1].style.display !== "none";
+
+    for(let i = 1; i < indexOfTotalRow; i++) {
+        section.children[i].style.display = flag ? "none" : "inline-flex";
     }
 
     let heading = document.getElementById(id + "-heading");
-    if(flag) 
-        heading.innerText = label + " ▼";
-    else 
-        heading.innerText = label + " ▲";
+    let label = heading.innerText.substring(0, heading.innerText.length - 1);
+
+    heading.innerText = flag ? label + "▼" : label + "▲";
 }
 
-let creditCardsToggleFlag = true;
-function toggleCreditCards() {
-    toggleSection(creditCardsToggleFlag, "credit-cards", "Credit Cards");
-    
-    creditCardsToggleFlag = !creditCardsToggleFlag;
-}
-
-let moneyToggleFlag = true;
-function toggleMoney() {
-    toggleSection(moneyToggleFlag, "money", "Money");
-
-    moneyToggleFlag = !moneyToggleFlag;
-}
-
-function addEntryRow(name, bank, onkeyup, parent) {
-    let html = "<span>\
+function drawEntryRow(name, bank, parentID) {
+    let html = "<span class='entry'>\
                     <div>\
                         <h3>" + name + "</h3>\
                         <p>" + bank + "</p>\
                     </div>\
-                    <input type='number' step='0.01' onkeyup='" + onkeyup + "'>\
+                    <input type='number' step='0.01' onkeyup='updateTotal(\"" + parentID + "\")'>\
                 </span>";
 
-    document.getElementById(parent).innerHTML += html;
+    document.getElementById(parentID).innerHTML += html;
 }
 
-function addTotalRow(id, parent) {
-    let html = "<span>\
+function drawTotalRow(parentID) {
+    let html = "<span class='entry'>\
                     <div>\
                         <h3>Total</h3>\
                     </div>\
-                    <p id='" + id + "'>$0.00</p>\
+                    <p id='" + parentID + "-total'>$0.00</p>\
                 </span>";
     
-    document.getElementById(parent).innerHTML += html;
+    document.getElementById(parentID).innerHTML += html;
 }
 
-function addMoneyRow(name, bank) {
-    addEntryRow(name, bank, 'updateTotal("money")', "money");
+function drawMoneyRow(name, bank) {
+    drawEntryRow(name, bank, MONEY_SECTION_ID);
 }
 
-function addCreditCardsRow(name, bank) {
-    addEntryRow(name, bank, 'updateTotal("credit-cards")', "credit-cards");
+function drawCreditCardsRow(name, bank) {
+    drawEntryRow(name, bank, CREDIT_CARDS_SECTION_ID);
 }
 
-addMoneyRow("Checking", "Manhattan Bank");
-addMoneyRow("Checking", "Cash App");
-addMoneyRow("Cash", "& etc.");
-addTotalRow("money-total", "money");
+// load from storage
 
-addCreditCardsRow("Blue Cash Preferred", "American Express");
-addCreditCardsRow("Hilton Honors", "American Express");
-addCreditCardsRow("Bread Cashback", "Bread Financial");
-addCreditCardsRow("Walmart Rewards", "Capital One");
-addCreditCardsRow("Amazon Prime", "Chase");
-addCreditCardsRow("Costco Anywhere", "Citi");
-addCreditCardsRow("Custom Cash", "Citi");
-addCreditCardsRow("Student Cash Back", "Discover");
-addCreditCardsRow("Kroger Rewards", "U.S. Bank");
-addCreditCardsRow("Apple Card", "Apple");
-addTotalRow("credit-cards-total", "credit-cards");
+function
+loadSectionDataFromStorage(id)
+{
+    let storageID = id;
 
-moneyValues = localStorage.getItem("money-values");
-if(moneyValues === null) moneyValues = new Array(3).fill(0);
-else moneyValues = moneyValues.split(",");
+    let item = localStorage.getItem(storageID);
+    if(item === null) return;
 
-creditCardsValues = localStorage.getItem("credit-cards-values");
-if(creditCardsValues === null) creditCardsValues = new Array(10).fill(0);
-else creditCardsValues = creditCardsValues.split(",");
+    let array = item.split(",");
 
-console.log(moneyValues)
+    let section = document.getElementById(id);
+    let entries = section.children;
+    let indexOfTotalRow = section.children.length - 1;
 
-let moneySection = document.getElementById("money");
-for(let i = 1; i < moneySection.children.length - 1; i++) {
-    if(moneyValues[i-1] != 0) moneySection.children[i].children[1].value = moneyValues[i-1];
+    for(let i = 1; i < indexOfTotalRow; i++) {
+        let val = array[i-1];
+        if(forceNumber(val) !== 0) entries[i].children[1].value = val;
+    }
 }
 
-let creditCardsSection = document.getElementById("credit-cards");
-for(let i = 1; i < creditCardsSection.children.length - 1; i++) {
-    if(creditCardsValues[i-1] != 0) creditCardsSection.children[i].children[1].value = creditCardsValues[i-1];
+function 
+loadEntriesFromStorage(id) 
+{
+    let storageID = id + "-entries";
+
+    let item = localStorage.getItem(storageID);
+    if(item === null) return [];
+
+    let array = item.split(",");
+
+    let entries = [];
+    for(let i = 0; i < array.length; i += 2) {
+        entries.push([array[i], array[i+1]]);
+    }
+
+    return entries;
 }
 
-updateTotal("credit-cards");
-updateTotal("money");
+function 
+addEntry(name, bank, entries, id) 
+{
+    let storageID = id + "-entries";
+
+    entries.push([name, bank]);
+    localStorage.setItem(storageID, entries);
+    localStorage.setItem(id, localStorage.getItem(id) + ",0");
+    //must add to data
+    refresh();
+}
+
+let moneyEntries;
+let creditCardsEntries;
+
+let moneyEntryDialog = document.getElementById("add-money-entry");
+function 
+openMoneyEntryDialog() 
+{
+    moneyEntryDialog.showModal();
+}
+
+function
+closeMoneyEntryDialog()
+{
+    moneyEntryDialog.close();
+}
+
+function 
+addMoneyEntry() 
+{
+    let name = moneyEntryDialog.children[0].children[1].value;
+    let bank = moneyEntryDialog.children[1].children[1].value;
+    moneyEntryDialog.close();
+    addEntry(name, bank, moneyEntries, MONEY_SECTION_ID);
+}
+
+let creditCardsEntryDialog = document.getElementById("add-credit-cards-entry");
+function
+openCreditCardsEntryDialog() 
+{
+    creditCardsEntryDialog.showModal();
+}
+
+function
+closeCreditCardsEntryDialog()
+{
+    creditCardsEntryDialog.close();
+}
+
+function
+addCreditCardsEntry() 
+{
+    let name = creditCardsEntryDialog.children[0].children[1].value;
+    let bank = creditCardsEntryDialog.children[1].children[1].value;
+    creditCardsEntryDialog.close();
+    addEntry(name, bank, creditCardsEntries, CREDIT_CARDS_SECTION_ID);
+}
+
+function 
+refresh() 
+{
+    document.getElementById(MONEY_SECTION_ID).innerHTML = baseMoneyHTML;
+    document.getElementById(CREDIT_CARDS_SECTION_ID).innerHTML = baseCreditCardsHTML;
+
+    moneyEntries = loadEntriesFromStorage("money");
+    creditCardsEntries = loadEntriesFromStorage("credit-cards");
+
+    for(let i = 0; i < moneyEntries.length; i++) {
+        drawMoneyRow(moneyEntries[i][0], moneyEntries[i][1]);
+    }
+    drawTotalRow(MONEY_SECTION_ID);
+    for(let i = 0; i < creditCardsEntries.length; i++) {
+        drawCreditCardsRow(creditCardsEntries[i][0], creditCardsEntries[i][1]);
+    }
+    drawTotalRow(CREDIT_CARDS_SECTION_ID);
+
+    loadSectionDataFromStorage(MONEY_SECTION_ID);
+    loadSectionDataFromStorage(CREDIT_CARDS_SECTION_ID);
+    
+    updateTotal(MONEY_SECTION_ID);
+    updateTotal(CREDIT_CARDS_SECTION_ID);
+}
+
+let baseMoneyHTML = document.getElementById(MONEY_SECTION_ID).innerHTML;
+let baseCreditCardsHTML = document.getElementById(CREDIT_CARDS_SECTION_ID).innerHTML;
+refresh();

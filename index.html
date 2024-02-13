@@ -8,7 +8,6 @@
         <meta name="apple-mobile-web-app-status-bar" content="#aa7700">
         <meta name="theme-color" content="black">
         
-        <!-- Manifest File link -->
         <link rel="manifest" href="manifest.webmanifest">
 
         <script>
@@ -33,17 +32,54 @@
     </head>
 
     <body>
+
+        <dialog class="add-entry" id="add-money-entry">
+            <span class="entry-detail">
+                <p><b>Type</b></p>
+                <input type="text">
+            </span>
+            <span class="entry-detail">
+                <p><b>Add'l. Info</b></p>
+                <input type="text">
+            </span>
+            <div>
+                <button class="close" onclick="closeMoneyEntryDialog()">Close</button>
+                <button class="close" onclick="addMoneyEntry()">Add Entry</button>
+            </div>
+        </dialog>
+
+        <dialog class="add-entry" id="add-credit-cards-entry">
+            <span class="entry-detail">
+                <p><b>Name</b></p>
+                <input type="text">
+            </span>
+            <span class="entry-detail">
+                <p><b>Bank</b></p>
+                <input type="text">
+            </span>
+            <div>
+                <button class="close" onclick="closeCreditCardsEntryDialog()">Close</button>
+                <button class="close" onclick="addCreditCardsEntry()">Add Entry</button>
+            </div>
+        </dialog>
+
         <section id="title-section">
             <h1>Budget</h1>
         </section>
         
 
         <section id="money">
-            <h2 id="money-heading" onclick="toggleMoney()">Money ▲</h2>
+            <span class="heading-row">
+                <h2 id="money-heading" onclick="toggleSection('money')">Money ▲</h2>
+                <button class="plus" onclick="openMoneyEntryDialog()">+</button>
+            </span>
         </section>
 
         <section id="credit-cards">
-            <h2 id="credit-cards-heading" onclick="toggleCreditCards()">Credit Cards ▲</h2>
+            <span class="heading-row">
+                <h2 id="credit-cards-heading" onclick="toggleSection('credit-cards')">Credit Cards ▲</h2>
+                <button class="plus" onclick="openCreditCardsEntryDialog()">+</button>
+            </span>
         </section>
 
         <section id="current-balance-section">
