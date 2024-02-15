@@ -48,7 +48,7 @@ updateTotal(id)
         // index 0 is the heading, skip it
         //stop before the total row
 
-        let val = entries[i].children[1].value;
+        let val = entries[i].children[1].children[0].value;
         // children[1] is the input field
         
         total += forceNumber(val);
@@ -98,7 +98,10 @@ function drawEntryRow(name, bank, parentID) {
                         <h3>" + name + "</h3>\
                         <p>" + bank + "</p>\
                     </div>\
-                    <input type='number' step='0.01' onkeyup='updateTotal(\"" + parentID + "\")'>\
+                    <div class='toolbox'>\
+                        <input type='number' step='0.01' onkeyup='updateTotal(\"" + parentID + "\")'>\
+                        <button onclick='removeEntry(\"" + name + bank + "\", \"" + parentID + "\")'  class='tool plus'>×</button>\
+                    </div>\
                 </span>";
 
     document.getElementById(parentID).innerHTML += html;
@@ -141,7 +144,7 @@ loadSectionDataFromStorage(id)
 
     for(let i = 1; i < indexOfTotalRow; i++) {
         let val = array[i-1];
-        if(forceNumber(val) !== 0) entries[i].children[1].value = val;
+        if(forceNumber(val) !== 0) entries[i].children[1].children[0].value = val;
     }
 }
 
@@ -170,9 +173,57 @@ addEntry(name, bank, entries, id)
 
     entries.push([name, bank]);
     localStorage.setItem(storageID, entries);
-    localStorage.setItem(id, localStorage.getItem(id) + ",0");
     //must add to data
     refresh();
+}
+
+function removeEntry(tag, id) {
+    let storageID = id + "-entries";
+    if(id === MONEY_SECTION_ID) {
+        for(let i = 0; i < moneyEntries.length; i++) {
+            if(tag === moneyEntries[i][0] + moneyEntries[i][1]) {
+                if(moneyEntries.length === 1) {
+                    moneyEntries = [];
+                    localStorage.removeItem(storageID);
+                } else {
+                    moneyEntries.splice(i, 1);
+                    localStorage.setItem(storageID, moneyEntries);
+
+                    let section = document.getElementById(MONEY_SECTION_ID);
+                    let entries = section.children;
+                    let indexOfTotalRow = entries.length - 1;
+                    for(let j = i+1; j < indexOfTotalRow - 1; j++) {
+                        entries[j].children[1].children[0].value = entries[j+1].children[1].children[0].value;
+                    }
+                }
+                break;
+            }
+        }
+    } else if(id === CREDIT_CARDS_SECTION_ID) {
+        for(let i = 0; i < creditCardsEntries.length; i++) {
+            if(tag === creditCardsEntries[i][0] + creditCardsEntries[i][1]) {
+                if(creditCardsEntries.length === 1) {
+                    creditCardsEntries = [];
+                    localStorage.removeItem(storageID);
+                } else {
+                    creditCardsEntries.splice(i, 1)
+                    localStorage.setItem(storageID, creditCardsEntries);
+
+                    let section = document.getElementById(CREDIT_CARDS_SECTION_ID);
+                    let entries = section.children;
+                    let indexOfTotalRow = entries.length - 1;
+                    for(let j = i+1; j < indexOfTotalRow - 1; j++) {
+                        entries[j].children[1].children[0].value = entries[j+1].children[1].children[0].value;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    updateTotal(id);
+    refresh();
+    
 }
 
 let moneyEntries;
