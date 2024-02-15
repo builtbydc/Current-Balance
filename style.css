@@ -92,9 +92,11 @@ dialog {
 }
 
 dialog > div {
-    width: 100%;
+    width: calc(100% - 2rem);
     display: flex;
-    justify-content: space-evenly;
+    justify-content: space-between;
+    padding-right: 1rem;
+    padding-left: 1rem;
 }
 
 .toolbox > input {
