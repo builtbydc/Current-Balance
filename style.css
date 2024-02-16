@@ -14,6 +14,7 @@ h1 {
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.4);
 
     position: fixed;
+    top: 0;
     background-color: white;
     width: 100%;
 
@@ -36,15 +37,15 @@ span {
     align-items: center;
 }
 
-.entry-detail {
+.dialog-entry {
     padding: 0.5rem 1rem 0.5rem 1rem;
 }
 
-.heading-row {
+.section-heading {
     width: calc(100% - 2rem);
 }
 
-.plus {
+.symbolic {
     border: none;
     background: none;
     color: blue;
@@ -61,7 +62,7 @@ button {
     border: none;
 }
 
-input {
+input.textbox {
     color: black;
     background: rgb(204,204,204);
     background: linear-gradient(180deg, rgba(230,230,230,1) 0%, rgba(255,255,255,1) 100%);
@@ -70,8 +71,8 @@ input {
     border-radius: 0.25rem;
 }
 
-.close {
-    width: 8rem;
+.labeled {
+    width: 6rem;
     height: 1.5rem;
     margin: 0.5rem 0 0.5rem 0;
     padding: 0.5rem;
@@ -91,6 +92,17 @@ dialog {
     border-radius: 1rem;
 }
 
+.dialog-buttons {
+    padding-right: 1rem;
+    padding-left: 1rem;
+}
+
+#add-section-button {
+    margin-left: 2rem;
+    margin-top: 1.5rem;
+}
+
+
 dialog > div {
     width: calc(100% - 2rem);
     display: flex;
@@ -99,12 +111,12 @@ dialog > div {
     padding-left: 1rem;
 }
 
-.toolbox > input {
+.toolbox > input.textbox {
     width: 50%;
     min-width: 5.5rem;
 }
 
-input {
+input.textbox {
     height: 1.5rem;
     padding: 0.5rem;
     font-size: 1rem;
@@ -116,11 +128,11 @@ input {
     width: 40%;
 }
 
-.tool {
+.toolbox > button {
     padding-left: 1rem;
 }
 
-dialog > span > input {
+dialog > span > input.textbox {
     width: calc(50% - 1rem);
 }
 
@@ -140,9 +152,25 @@ dialog > span > input {
     border-radius: 1rem 1rem 0rem 0rem;
 }
 
-#money {
+body {
     padding-top: 7rem;
-}
-#credit-cards {
     padding-bottom: 7rem;
+}
+
+input.radio-option {
+    height: unset;
+    width: unset;
+    border: none;
+    box-shadow: none;
+    padding:none;
+    margin: none;
+    margin-left: 1rem;
+}
+
+span.radio > label {
+    padding-left: 0.5rem;
+}
+
+.dialog-entry {
+    height: 2rem;
 }
