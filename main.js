@@ -56,7 +56,6 @@ retrieveCache() {
     if(rawCacheData === null) return [];
 
     let cacheData = rawCacheData.split(",");
-    console.log(cacheData);
     let tempCache = [];
 
     let numberOfSections = forceNumber(cacheData[0]);
@@ -102,7 +101,6 @@ addSection()
     sectionMap.set("#title", dialog.children[0].children[1].value);
     sectionMap.set("#operation", dialog.children[1].children[1].children[0].checked);
     sectionMap.set("#color", dialog.children[2].children[1].value);
-    console.log(dialog.children[2].children[1].value);
 
     cache.push(sectionMap);
     dialog.close();
@@ -116,6 +114,28 @@ addEntry(i, dialogID)
     let dialog = document.getElementById(dialogID);
     let key = dialog.children[0].children[1].value + "|" + dialog.children[1].children[1].value;
     cache[i].set(key, 0);
+    closeDialog(dialogID);
+    saveCache();
+    refreshPage();
+}
+
+function
+editEntry(index, dialogID, oldKey) {
+    let dialog = document.getElementById(dialogID);
+    let newKey = dialog.children[0].children[1].value + "|" + dialog.children[1].children[1].value;
+    let newCache = [];
+    for(let i = 0; i < cache.length; i++) {
+        newCache.push(new Map());
+        for(let key of cache[i].keys()) {
+            if(i === index && key === oldKey) {
+                newCache[i].set(newKey, cache[i].get(oldKey));
+            } else {
+                newCache[i].set(key, cache[i].get(key));
+            }
+        }
+    }
+    cache = newCache;
+
     closeDialog(dialogID);
     saveCache();
     refreshPage();
@@ -158,18 +178,57 @@ removeEntry(i, key)
 }
 
 function
+toggleEntryMenu(menuID) {
+    let content = document.getElementById("content");
+    for(let i = 0; i < cache.length; i++) {
+        let section = content.children[i];
+        let sectionID = "section-" + i;
+
+        let j = 0;
+        for(let key of cache[i].keys()) {
+            if(sectionKeywords.has(key)) {
+                continue;
+            }
+
+            let entry = section.children[1 + j];
+            let menuIDj = sectionID + "-menu-" + j;
+
+            if(menuID === menuIDj) {
+                j++;
+                continue;
+            }
+
+            entry.children[1].children[1].innerText = "⋮";
+            entry.children[1].children[0].style.display = "unset";
+            document.getElementById(menuIDj).style.display = "none";
+
+            j++;
+        }
+
+    }
+    let menu = document.getElementById(menuID);
+    if(menu.style.display === "none") {
+        document.getElementById(menuID).style.display = "unset";
+    } else {
+        menu.style.display = "none";
+    }
+}
+
+function
 refreshPage()
 {
-    console.log(cache);
     let content = document.getElementById("content");
     let dialogs = document.getElementById("dialogs");
+    let editDialogs = document.getElementById("edit-dialogs");
     content.innerHTML = "";
     dialogs.innerHTML = "";
+    editDialogs.innerHTML = "";
 
     let sectionHTML = document.getElementById("section-template").innerHTML;
     let entrySpanHTML = document.getElementById("entry-span-template").innerHTML;
     let totalSpanHTML = document.getElementById("total-span-template").innerHTML;
     let addEntryDialogHTML = document.getElementById("add-entry-dialog-template").innerHTML;
+    let editEntryDialogHTML = document.getElementById("edit-entry-dialog-template").innerHTML;
 
     for(let i = 0; i < cache.length; i++) {
         content.innerHTML += sectionHTML;
@@ -178,6 +237,7 @@ refreshPage()
         section.id = sectionID;
         section.children[0].children[0].innerText = cache[i].get("#title");
         section.style = "color:" + cache[i].get("#color") + ";";
+
 
         dialogs.innerHTML += addEntryDialogHTML;
         let dialog = dialogs.children[i];
@@ -190,8 +250,7 @@ refreshPage()
             if(sectionKeywords.has(key)) {
                 continue;
             }
-            console.log(cache[i].keys())
-            console.log(key);
+
             let labels = key.split("|");
             let val = cache[i].get(key);
             section.innerHTML += entrySpanHTML;
@@ -199,9 +258,17 @@ refreshPage()
             entry.children[0].children[0].children[0].innerText = labels[0];
             entry.children[0].children[1].innerText = labels[1];
             if(val !== 0) {
-                console.log(entry.children[1].children[0]);
                 entry.children[1].children[0].value = val;
             }
+
+            let menuID = sectionID + "-menu-" + j;
+
+            entry.children[1].children[2].id = menuID;
+
+            editDialogs.innerHTML += editEntryDialogHTML;
+            
+            editDialogs.children[editDialogs.children.length - 1].id = sectionID + "-edit-" + j;
+            //console.log(editDialogs.children);
 
             j++;
         }
@@ -244,14 +311,49 @@ refreshPage()
                 updateTotal();
             });
 
+            let menuID = sectionID + "-menu-" + j;
+
             entry.children[1].children[1].addEventListener("click", function() {
+                // removeEntry(i, key);
+                if(entry.children[1].children[1].innerText === "⋮") {
+                    entry.children[1].children[1].innerText = "×";
+                    entry.children[1].children[0].style.display = "none";
+                } else {
+                    entry.children[1].children[1].innerText = "⋮";
+                    entry.children[1].children[0].style.display = "unset";
+                }
+
+                toggleEntryMenu(menuID);
+
+            });
+
+            let entryEditDialogID = sectionID + "-edit-" + j;
+
+            entry.children[1].children[2].children[0].addEventListener("click", function() {
+                console.log(entryEditDialogID);
+                openDialog(entryEditDialogID);
+                document.getElementById(entryEditDialogID).children[0].children[1].value = key.split("|")[0];
+                document.getElementById(entryEditDialogID).children[1].children[1].value = key.split("|")[1];
+            })
+
+            entry.children[1].children[2].children[1].addEventListener("click", function() {
                 removeEntry(i, key);
+            });
+
+            document.getElementById(entryEditDialogID).children[2].children[0].addEventListener("click", function() {
+                closeDialog(entryEditDialogID);
+            })
+
+            document.getElementById(entryEditDialogID).children[2].children[1].addEventListener("click", function() {
+                editEntry(i, entryEditDialogID, key);
             })
 
             j++;
         }
 
     }
+
+    updateTotal();
 }
 
 let sectionKeywords = new Set(["#title", "#operation", "#color"]);
@@ -259,4 +361,3 @@ let sectionKeywords = new Set(["#title", "#operation", "#color"]);
 let CACHE_STORAGE_ID = "cache-storage";
 let cache = retrieveCache();
 refreshPage();
-updateTotal();
