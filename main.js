@@ -278,6 +278,39 @@ deleteSection(i)
 }
 
 function
+closeAllMenus() {
+    let content = document.getElementById("content");
+    for(let i = 0; i < cache.length; i++) {
+        let section = descendant(content, i);
+        let sectionMenu = descendant(section, 0, 2);
+        let sectionMenuButton = descendant(section, 0, 1);
+        sectionMenu.style.transform = "scale(0)";
+        sectionMenuButton.innerText = "☰";
+
+        let j = 0;
+        for(let key of cache[i].keys()) {
+            if(KEYWORDS.has(key)) {
+                continue;
+            }
+
+            let entrySpan = descendant(section, 1 + j);
+            let menu = descendant(entrySpan, 1, 2);
+            let menuButton = descendant(entrySpan, 1, 1);
+            menu.style.transform = "scale(0)";
+            menuButton.innerText = "⋮";
+
+            j++;
+        }
+    }
+}
+
+function openMenu(menuID) {
+    let menu = document.getElementById(menuID);
+    menu.style.transform = "scale(1)";
+    menu.previousElementSibling.innerText = "×";
+}
+
+function
 refreshPage()
 {
     // identify containers
@@ -311,6 +344,10 @@ refreshPage()
         let sectionTitle = descendant(section, 0, 0);
         sectionTitle.innerText = cache[i].get("#title");
         section.style = "color:" + cache[i].get("#color") + ";";
+
+        let sectionMenuID = sectionID + "-menu";
+        let sectionMenu = descendant(section, 0, 2);
+        sectionMenu.id = sectionMenuID;
 
         appendElementWithID(addEntryDialogContainer, addEntryDialogHTML, 
                             sectionID + "-add-entry-dialog");
@@ -375,12 +412,10 @@ refreshPage()
         let sectionMenuID = sectionMenu.id;
         let sectionMenuButton = descendant(section, 0, 1);
         sectionMenuButton.addEventListener("click", function() {
-            if(sectionMenuButton.innerText === "☰") {
-                sectionMenuButton.innerText = "×";
-                sectionMenu.style.display = "unset";
-            } else {
-                sectionMenuButton.innerText = "☰";
-                sectionMenu.style.display = "none";
+            let readyToOpen = sectionMenuButton.innerText === "☰";
+            closeAllMenus();
+            if(readyToOpen) {
+                openMenu(sectionMenuID);
             }
         });
 
@@ -460,17 +495,11 @@ refreshPage()
 
             let menuButton = descendant(entrySpan, 1, 1);
             menuButton.addEventListener("click", function() {
-                // toggle button appearance
-                // hide text box when menu is open
-                if(menuButton.innerText === "⋮") {
-                    menuButton.innerText = "×";
-                    balanceTextBox.style.display = "none";
-                } else {
-                    menuButton.innerText = "⋮";
-                    balanceTextBox.style.display = "unset";
+                let readyToOpen = menuButton.innerText === "⋮";
+                closeAllMenus();
+                if(readyToOpen) {
+                    openMenu(menuID);
                 }
-
-                toggleEntryMenu(menuID);
             });
 
             // inescapable hack

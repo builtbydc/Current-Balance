@@ -65,8 +65,8 @@
                 <span class="section-heading">
                     <h2>[Section Title]</h2>
                     <button class="symbolic">☰</button>
-                    <div class="section-menu menu" style="display: none;">
-                        <p>Add Entry</p>
+                    <div class="section-menu menu" style="transform: scale(0);">
+                        <p>Add Item</p>
                         <p>Edit Section</p>
                         <p>Delete Section</p>
                     </div>
@@ -83,20 +83,20 @@
                 <span class="toolbox">
                     <input class="textbox" type="text" inputmode="decimal">
                     <button class="symbolic">⋮</button>
-                    <div class="menu" style="display: none;">
-                        <p>Edit</p>
-                        <p>Delete</p>
+                    <div class="menu" style="transform: scale(0);">
+                        <p>Edit Item</p>
+                        <p>Delete Item</p>
                     </div>
                 </span>
             </span>
         </template>
 
         <template id="total-span-template">
-            <span class="entry">
+            <span class="entry total-container">
                 <div>
-                    <h3>Total</h3>
+                    <h3>TOTAL</h3>
                 </div>
-                <p>$0.00</p>
+                <p class="total">$0.00</p>
             </span>
         </template>
 
@@ -134,7 +134,7 @@
                 </span>
                 <span class="dialog-entry">
                     <p><b>Detail</b></p>
-                    <input class="textbox" type="text">
+                    <input class="textbox" type="text" placeholder="Optional">
                 </span>
                 <span class="dialog-buttons">
                     <button class="labeled">Cancel</button>
@@ -151,7 +151,7 @@
                 </span>
                 <span class="dialog-entry">
                     <p><b>Detail</b></p>
-                    <input class="textbox" type="text">
+                    <input class="textbox" type="text" placeholder="Optional">
                 </span>
                 <span class="dialog-buttons">
                     <button class="labeled">Cancel</button>
@@ -165,7 +165,7 @@
         <div id="edit-dialogs"></div>
         <div id="content"></div>
 
-        <button id="add-section-button" class="labeled" onclick="openDialog('add-section-dialog')">Add Section</button>
+        <button id="add-section-button" class="labeled" onclick="openDialog('add-section-dialog')">Add Section +</button>
 
         <section id="current-balance-section">
             <h2>Current Balance</h2>
