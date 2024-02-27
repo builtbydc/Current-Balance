@@ -129,6 +129,7 @@ dialog {
 #add-section-button {
     margin-left: 2rem;
     margin-top: 2rem;
+    margin-bottom: 2rem;
 }
 
 
@@ -182,7 +183,7 @@ dialog > span > input.textbox {
 
 body {
     padding-top: 6rem;
-    padding-bottom: 7rem;
+    padding-bottom: 6rem;
 }
 
 input.radio-option {
