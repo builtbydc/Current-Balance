@@ -58,8 +58,9 @@ span {
     background: none;
     font-size: 2rem;
     color: inherit;
-    min-width: 2.25rem;
-    height: 100%;
+    min-width: 2.75rem;
+    max-width: 2.75rem;
+    height: 2.75rem;
     padding-left: 1rem;
 }
 
@@ -203,6 +204,16 @@ span.radio > label {
     color: black;
 
     box-shadow: 0 0 1rem rgba(0, 0, 0, 0.4);
+}
+
+.section-heading {
+    position: relative;
+}
+
+.section-menu {
+    top: 1rem;
+    width: calc(20% + 0.2rem);
+    right: 4.75rem;
 }
 
 .menu > p {

@@ -64,7 +64,12 @@
             <section>
                 <span class="section-heading">
                     <h2>[Section Title]</h2>
-                    <button class="symbolic plus">+</button>
+                    <button class="symbolic">☰</button>
+                    <div class="section-menu menu" style="display: none;">
+                        <p>Add Entry</p>
+                        <p>Edit Section</p>
+                        <p>Delete Section</p>
+                    </div>
                 </span>
             </section>
         </template>
@@ -93,6 +98,32 @@
                 </div>
                 <p>$0.00</p>
             </span>
+        </template>
+
+        <template id="edit-section-dialog-template">
+            <dialog>
+                <span class="dialog-entry">
+                    <p><b>Title</b></p>
+                    <input class="textbox" type="text">
+                </span>
+                <span class="dialog-entry">
+                    <p><b>Function</b></p>
+                    <span class="radio">
+                        <input class="radio-option" type="radio" name="sign-radio" value="Positively">
+                        <label>Add</label>
+                        <input class="radio-option" type="radio" name="sign-radio" value="Negatively">
+                        <label>Subtract</label>
+                    </span>
+                </span>
+                <span class="dialog-entry">
+                    <p><b>Color</b></p>
+                    <input class="color-picker" type="color">
+                </span>
+                <span class="dialog-buttons">
+                    <button class="labeled">Cancel</button>
+                    <button class="labeled">Save</button>
+                </span>
+            </dialog>
         </template>
 
         <template id="add-entry-dialog-template">
@@ -129,6 +160,7 @@
             </dialog>
         </template>
 
+        <div id="edit-section-dialogs"></div>
         <div id="dialogs"></div>
         <div id="edit-dialogs"></div>
         <div id="content"></div>

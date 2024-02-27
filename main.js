@@ -246,15 +246,49 @@ appendElementWithID(container, templateHTML, id)
 }
 
 function
+editSection(i, dialogID) 
+{
+    let dialog = document.getElementById(dialogID);
+    let title = descendant(dialog, 0, 1).value;
+    let operation = descendant(dialog, 1, 1, 0).checked;
+    let color = descendant(dialog, 2, 1).value;
+
+    cache[i].set("#title", title);
+    cache[i].set("#operation", operation);
+    cache[i].set("#color", color);
+
+    dialog.close();
+    saveCache();
+    refreshPage();
+}
+
+function
+deleteSection(i) 
+{
+    let newCache = [];
+    for(let j = 0; j < cache.length; j++) {
+        if(i === j) {
+            continue;
+        }
+        newCache.push(cache[j]);
+    }
+    cache = newCache;
+    saveCache();
+    refreshPage();
+}
+
+function
 refreshPage()
 {
     // identify containers
     let contentContainer = document.getElementById("content");
+    let editSectionDialogContainer = document.getElementById("edit-section-dialogs");
     let addEntryDialogContainer = document.getElementById("dialogs");
     let editEntryDialogContainer = document.getElementById("edit-dialogs");
     
     // reset page
     contentContainer.innerHTML = "";
+    editSectionDialogContainer.innerHTML = "";
     addEntryDialogContainer.innerHTML = "";
     editEntryDialogContainer.innerHTML = "";
 
@@ -262,6 +296,7 @@ refreshPage()
     let sectionHTML = document.getElementById("section-template").innerHTML;
     let entrySpanHTML = document.getElementById("entry-span-template").innerHTML;
     let totalSpanHTML = document.getElementById("total-span-template").innerHTML;
+    let editSectionDialogHTML = document.getElementById("edit-section-dialog-template").innerHTML;
     let addEntryDialogHTML = document.getElementById("add-entry-dialog-template").innerHTML;
     let editEntryDialogHTML = document.getElementById("edit-entry-dialog-template").innerHTML;
 
@@ -278,7 +313,18 @@ refreshPage()
         section.style = "color:" + cache[i].get("#color") + ";";
 
         appendElementWithID(addEntryDialogContainer, addEntryDialogHTML, 
-                         sectionID + "-add-entry-dialog");
+                            sectionID + "-add-entry-dialog");
+        
+        let editSectionDialog = appendElementWithID(editSectionDialogContainer, editSectionDialogHTML,
+                            sectionID + "-edit-section-dialog");
+        let editSectionRadio = descendant(editSectionDialog, 1, 1);
+        let editSectionRadioPositiveID = sectionID + "-edit-dialog-radio-positive";
+        let editSectionRadioNegativeID = sectionID + "-edit-dialog-radio-negative";
+
+        descendant(editSectionRadio, 0).id = editSectionRadioPositiveID;
+        descendant(editSectionRadio, 1).for = editSectionRadioPositiveID;
+        descendant(editSectionRadio, 2).id = editSectionRadioNegativeID;
+        descendant(editSectionRadio, 3).for = editSectionRadioNegativeID;
         
         // inner loop: loop over entries
         let j = 0; // key number
@@ -324,10 +370,54 @@ refreshPage()
         let addEntryDialog = descendant(addEntryDialogContainer, i);
         let addEntryDialogID = addEntryDialog.id;
 
-        // plus button in each section
-        let addEntryButton = descendant(section, 0, 1);
-        addEntryButton.addEventListener("click", function() {
+        // menu button in each section
+        let sectionMenu = descendant(section, 0, 2);
+        let sectionMenuID = sectionMenu.id;
+        let sectionMenuButton = descendant(section, 0, 1);
+        sectionMenuButton.addEventListener("click", function() {
+            if(sectionMenuButton.innerText === "☰") {
+                sectionMenuButton.innerText = "×";
+                sectionMenu.style.display = "unset";
+            } else {
+                sectionMenuButton.innerText = "☰";
+                sectionMenu.style.display = "none";
+            }
+        });
+
+        let sectionMenuAddButton = descendant(sectionMenu, 0);
+        sectionMenuAddButton.addEventListener("click", function() {
             openDialog(addEntryDialogID);
+        });
+
+        let editSectionDialog = descendant(editSectionDialogContainer, i);
+        let editSectionDialogID = editSectionDialog.id;
+
+        let sectionMenuEditButton = descendant(sectionMenu, 1);
+        sectionMenuEditButton.addEventListener("click", function() {
+            openDialog(editSectionDialogID);
+            descendant(editSectionDialog, 0, 1).value = cache[i].get("#title");
+            if(cache[i].get("#operation")) {
+                descendant(editSectionDialog, 1, 1, 0).checked = true;
+            } else {
+                descendant(editSectionDialog, 1, 1, 2).checked = true;
+            }
+            descendant(editSectionDialog, 2, 1).value = cache[i].get("#color");
+        });
+
+        let editSectionDialogCancelButton = descendant(editSectionDialog, 3, 0);
+        let editSectionDialogSaveButton = descendant(editSectionDialog, 3, 1);
+
+        editSectionDialogCancelButton.addEventListener("click", function() {
+            closeDialog(editSectionDialogID);
+        });
+
+        editSectionDialogSaveButton.addEventListener("click", function() {
+            editSection(i, editSectionDialogID);
+        });
+
+        let sectionMenuDeleteButton = descendant(sectionMenu, 2);
+        sectionMenuDeleteButton.addEventListener("click", function() {
+            deleteSection(i);
         });
 
         // cancel button in dialog
