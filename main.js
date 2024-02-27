@@ -150,7 +150,7 @@ updateTotal()
 
         let sectionTotal = 0;
         for(let key of cache[i].keys()) {
-            if(sectionKeywords.has(key)) {
+            if(KEYWORDS.has(key)) {
                 continue;
             }
 
@@ -186,7 +186,7 @@ toggleEntryMenu(menuID) {
 
         let j = 0;
         for(let key of cache[i].keys()) {
-            if(sectionKeywords.has(key)) {
+            if(KEYWORDS.has(key)) {
                 continue;
             }
 
@@ -215,138 +215,203 @@ toggleEntryMenu(menuID) {
 }
 
 function
+descendant(element, ...path) 
+{
+    let out = element;
+
+    for(let turn of path) {
+        out = out.children[turn];
+    }
+
+    return out;
+}
+
+function
+appendElement(container, templateHTML)
+{
+    container.innerHTML += templateHTML;
+    let element = container.lastElementChild;
+    
+    return element;
+}
+
+function
+appendElementWithID(container, templateHTML, id) 
+{
+    container.innerHTML += templateHTML;
+    let element = container.lastElementChild;
+    element.id = id;
+
+    return element;
+}
+
+function
 refreshPage()
 {
-    let content = document.getElementById("content");
-    let dialogs = document.getElementById("dialogs");
-    let editDialogs = document.getElementById("edit-dialogs");
-    content.innerHTML = "";
-    dialogs.innerHTML = "";
-    editDialogs.innerHTML = "";
+    // identify containers
+    let contentContainer = document.getElementById("content");
+    let addEntryDialogContainer = document.getElementById("dialogs");
+    let editEntryDialogContainer = document.getElementById("edit-dialogs");
+    
+    // reset page
+    contentContainer.innerHTML = "";
+    addEntryDialogContainer.innerHTML = "";
+    editEntryDialogContainer.innerHTML = "";
 
+    // grab default HTML
     let sectionHTML = document.getElementById("section-template").innerHTML;
     let entrySpanHTML = document.getElementById("entry-span-template").innerHTML;
     let totalSpanHTML = document.getElementById("total-span-template").innerHTML;
     let addEntryDialogHTML = document.getElementById("add-entry-dialog-template").innerHTML;
     let editEntryDialogHTML = document.getElementById("edit-entry-dialog-template").innerHTML;
 
+    // LOOP NUMBER ONE: BUILD HTML
+    // outer loop: loop over sections
     for(let i = 0; i < cache.length; i++) {
-        content.innerHTML += sectionHTML;
-        let section = content.children[i];
+
         let sectionID = "section-" + i;
-        section.id = sectionID;
-        section.children[0].children[0].innerText = cache[i].get("#title");
+        let section = appendElementWithID(contentContainer, sectionHTML, sectionID);
+
+        // apply section attributes
+        let sectionTitle = descendant(section, 0, 0);
+        sectionTitle.innerText = cache[i].get("#title");
         section.style = "color:" + cache[i].get("#color") + ";";
 
-
-        dialogs.innerHTML += addEntryDialogHTML;
-        let dialog = dialogs.children[i];
-        let dialogID = sectionID + "-add-entry-dialog";
-        dialog.id = dialogID;
+        appendElementWithID(addEntryDialogContainer, addEntryDialogHTML, 
+                         sectionID + "-add-entry-dialog");
         
-
-        let j = 0;
+        // inner loop: loop over entries
+        let j = 0; // key number
         for(let key of cache[i].keys()) {
-            if(sectionKeywords.has(key)) {
+
+            if(KEYWORDS.has(key)) {
                 continue;
+                // not an entry
             }
 
+            // split key into name and detail
             let labels = key.split("|");
-            let val = cache[i].get(key);
-            section.innerHTML += entrySpanHTML;
-            let entry = section.children[1 + j];
-            entry.children[0].children[0].children[0].innerText = labels[0];
-            entry.children[0].children[1].innerText = labels[1];
-            if(val !== 0) {
-                entry.children[1].children[0].value = val;
-            }
 
+            // add entry and labels
+            let entrySpan = appendElement(section, entrySpanHTML);
+            let name = descendant(entrySpan, 0, 0, 0);
+            let detail = descendant(entrySpan, 0, 1);
+            name.innerText = labels[0];
+            detail.innerText = labels[1];
+
+            // give id to menu
+            let menu = descendant(entrySpan, 1, 2);
             let menuID = sectionID + "-menu-" + j;
+            menu.id = menuID;
 
-            entry.children[1].children[2].id = menuID;
-
-            editDialogs.innerHTML += editEntryDialogHTML;
-            
-            editDialogs.children[editDialogs.children.length - 1].id = sectionID + "-edit-" + j;
-            //console.log(editDialogs.children);
+            appendElementWithID(editEntryDialogContainer, editEntryDialogHTML, 
+                             sectionID + "-edit-" + j);
 
             j++;
         }
 
-        section.innerHTML += totalSpanHTML;
-        section.children[1+j].id = sectionID + "-total-span"
+        appendElementWithID(section, totalSpanHTML, sectionID + "-total-span");
     }
 
+    // LOOP NUMBER TWO: ADD EVENT LISTENERS AND DETAILS
+    // outer loop: loop over sections
     for(let i = 0; i < cache.length; i++) {
-        let section = content.children[i];
-        let sectionID = "section-" + i;
-        let dialog = dialogs.children[i];
-        let dialogID = sectionID + "-add-entry-dialog"
+        // get section details
+        let section = descendant(contentContainer, i);
+        let sectionID = section.id;
 
-        dialog.children[2].children[0].addEventListener("click", function() {
-            closeDialog(dialogID);
-        });
-        dialog.children[2].children[1].addEventListener("click", function() {
-            addEntry(i, dialogID);
-        });
+        // get add entry details
+        let addEntryDialog = descendant(addEntryDialogContainer, i);
+        let addEntryDialogID = addEntryDialog.id;
 
-        section.children[0].children[1].addEventListener("click", function() {
-            openDialog(dialogID);
+        // plus button in each section
+        let addEntryButton = descendant(section, 0, 1);
+        addEntryButton.addEventListener("click", function() {
+            openDialog(addEntryDialogID);
         });
 
-        let j = 0;
+        // cancel button in dialog
+        let addEntryDialogCancelButton = descendant(addEntryDialog, 2, 0);
+        addEntryDialogCancelButton.addEventListener("click", function() {
+            closeDialog(addEntryDialogID);
+        });
+
+        // add entry button in dialog
+        let addEntryDialogAddButton = descendant(addEntryDialog, 2, 1);
+        addEntryDialogAddButton.addEventListener("click", function() {
+            addEntry(i, addEntryDialogID);
+        });
+
+        // inner loop: loop over entries
+        let j = 0; // key number
         for(let key of cache[i].keys()) {
-            if(sectionKeywords.has(key)) {
+            if(KEYWORDS.has(key)) {
                 continue;
-            }
-            let entry = section.children[1 + j];
-
-            let val = cache[i].get(key);
-            if(val !== 0) {
-                entry.children[1].children[0].value = val;
+                // not an entry
             }
 
-            entry.children[1].children[0].addEventListener("keyup", function() {
-                cache[i].set(key, forceNumber(entry.children[1].children[0].value));
+            let entrySpan = descendant(section, 1 + j); // skips the title row
+
+            // fill text boxes with saved values
+            let balance = cache[i].get(key);
+            let balanceTextBox = descendant(entrySpan, 1, 0);
+            if(balance !== 0) {
+                balanceTextBox.value = balance;
+            }
+
+            // any time a number is entered or changed
+            balanceTextBox.addEventListener("keyup", function() {
+                cache[i].set(key, forceNumber(balanceTextBox.value));
                 updateTotal();
             });
 
-            let menuID = sectionID + "-menu-" + j;
+            let menu = descendant(entrySpan, 1, 2);
+            let menuID = menu.id;
 
-            entry.children[1].children[1].addEventListener("click", function() {
-                // removeEntry(i, key);
-                if(entry.children[1].children[1].innerText === "⋮") {
-                    entry.children[1].children[1].innerText = "×";
-                    entry.children[1].children[0].style.display = "none";
+            let menuButton = descendant(entrySpan, 1, 1);
+            menuButton.addEventListener("click", function() {
+                // toggle button appearance
+                // hide text box when menu is open
+                if(menuButton.innerText === "⋮") {
+                    menuButton.innerText = "×";
+                    balanceTextBox.style.display = "none";
                 } else {
-                    entry.children[1].children[1].innerText = "⋮";
-                    entry.children[1].children[0].style.display = "unset";
+                    menuButton.innerText = "⋮";
+                    balanceTextBox.style.display = "unset";
                 }
 
                 toggleEntryMenu(menuID);
-
             });
 
-            let entryEditDialogID = sectionID + "-edit-" + j;
+            // inescapable hack
+            let editEntryDialogID = sectionID + "-edit-" + j;
+            let editEntryDialog = document.getElementById(editEntryDialogID);
 
-            entry.children[1].children[2].children[0].addEventListener("click", function() {
-                console.log(entryEditDialogID);
-                openDialog(entryEditDialogID);
-                document.getElementById(entryEditDialogID).children[0].children[1].value = key.split("|")[0];
-                document.getElementById(entryEditDialogID).children[1].children[1].value = key.split("|")[1];
-            })
+            let labels = key.split("|");
 
-            entry.children[1].children[2].children[1].addEventListener("click", function() {
+            let menuEditButton = descendant(entrySpan, 1, 2, 0);
+            menuEditButton.addEventListener("click", function() {
+                openDialog(editEntryDialogID);
+
+                // fill with current values
+                descendant(editEntryDialog, 0, 1).value = labels[0];
+                descendant(editEntryDialog, 1, 1).value = labels[1];
+            });
+
+            let menuDeleteButton = descendant(entrySpan, 1, 2, 1);
+            menuDeleteButton.addEventListener("click", function() {
                 removeEntry(i, key);
             });
 
-            document.getElementById(entryEditDialogID).children[2].children[0].addEventListener("click", function() {
-                closeDialog(entryEditDialogID);
-            })
+            let editEntryDialogCancelButton = descendant(editEntryDialog, 2, 0);
+            editEntryDialogCancelButton.addEventListener("click", function() {
+                closeDialog(editEntryDialogID);
+            });
 
-            document.getElementById(entryEditDialogID).children[2].children[1].addEventListener("click", function() {
-                editEntry(i, entryEditDialogID, key);
-            })
+            let editEntryDialogSaveButton = descendant(editEntryDialog, 2, 1);
+            editEntryDialogSaveButton.addEventListener("click", function() {
+                editEntry(i, editEntryDialogID, key);
+            });
 
             j++;
         }
@@ -356,7 +421,7 @@ refreshPage()
     updateTotal();
 }
 
-let sectionKeywords = new Set(["#title", "#operation", "#color"]);
+let KEYWORDS = new Set(["#title", "#operation", "#color"]);
 
 let CACHE_STORAGE_ID = "cache-storage";
 let cache = retrieveCache();
