@@ -343,7 +343,8 @@ refreshPage()
         // apply section attributes
         let sectionTitle = descendant(section, 0, 0);
         sectionTitle.innerText = cache[i].get("#title");
-        section.style = "color:" + cache[i].get("#color") + ";";
+        section.style.color = cache[i].get("#color");
+        section.style["border-bottom"] = "2px solid " + cache[i].get("#color");
 
         let sectionMenuID = sectionID + "-menu";
         let sectionMenu = descendant(section, 0, 2);
@@ -381,6 +382,11 @@ refreshPage()
             let detail = descendant(entrySpan, 0, 1);
             name.innerText = labels[0];
             detail.innerText = labels[1];
+
+            // give color to text box
+            let balanceTextBox = descendant(entrySpan, 1, 0);
+            balanceTextBox.style.border = "2px solid " + cache[i].get("#color");
+
 
             // give id to menu
             let menu = descendant(entrySpan, 1, 2);
