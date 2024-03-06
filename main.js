@@ -670,6 +670,10 @@ refreshPage()
 
 let SETTINGS_STORAGE_ID = "settings-storage";
 let settings = retrieveSettings();
+if(settings.length !== 8) {
+    localStorage.removeItem(SETTINGS_STORAGE_ID);
+    settings = retrieveSettings();
+}
 
 let KEYWORDS = new Set(["#title", "#operation", "#color"]);
 let CACHE_STORAGE_ID = "cache-storage";

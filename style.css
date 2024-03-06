@@ -305,3 +305,8 @@ span.radio > label {
     font-weight: bold;
 
 }
+
+#title-section .symbolic {
+    font-size: 3rem;
+    height: 4rem;
+}
