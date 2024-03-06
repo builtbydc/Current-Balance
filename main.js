@@ -78,12 +78,42 @@ retrieveCache() {
     return tempCache;
 }
 
+function openSettings() {
+    let dialog = document.getElementById("settings-dialog");
+    for(let i = 0; i < settings.length; i++) {
+        descendant(dialog, i, 1).value = settings[i];
+    }
+    dialog.showModal();
+}
+
+function
+retrieveSettings() 
+{
+    let settingsData = localStorage.getItem(SETTINGS_STORAGE_ID);
+    if(settingsData === null) return ["Budget", "Current Balance", "#ffffff", "#ffffff", "#000000"];
+
+    return settingsData.split(",");
+}
+
+function
+saveSettings()
+{
+    let dialog = document.getElementById("settings-dialog");
+    for(let i = 0; i < settings.length; i++) {
+        settings[i] = descendant(dialog, i, 1).value;
+    }
+    localStorage.setItem(SETTINGS_STORAGE_ID, settings);
+    dialog.close();
+    refreshPage();
+}
+
 // OPENING DIALOGS & ADDING TO PAGE
 ///////////////////////////////////
 
 function 
 openDialog(id) 
 {
+    closeAllMenus();
     document.getElementById(id).showModal();
 }
 
@@ -313,6 +343,25 @@ function openMenu(menuID) {
 function
 refreshPage()
 {
+    // apply page settings
+    let titleSection = document.getElementById("title-section");
+    descendant(titleSection, 0, 0).innerText = settings[0];
+    let bottomSection = document.getElementById("current-balance-section");
+    descendant(bottomSection, 0, 0).innerText = settings[1];
+    document.querySelector("body").style.background = settings[2];
+    titleSection.style.background = settings[3];
+    bottomSection.style.background = settings[3];
+    titleSection.style.color = settings[4];
+    bottomSection.style.color = settings[4];
+
+    titleSection.style["border-bottom"] = "2px solid " + settings[4];
+    bottomSection.style["border-top"]  = "2px solid " + settings[4];
+
+    let addSectionButton = document.getElementById("add-section-button");
+    addSectionButton.style.border = "2px solid " + settings[4];
+    addSectionButton.style.background = settings[3];
+    addSectionButton.style.color = settings[4];
+
     // identify containers
     let contentContainer = document.getElementById("content");
     let editSectionDialogContainer = document.getElementById("edit-section-dialogs");
@@ -386,6 +435,7 @@ refreshPage()
             // give color to text box
             let balanceTextBox = descendant(entrySpan, 1, 0);
             balanceTextBox.style.border = "2px solid " + cache[i].get("#color");
+            balanceTextBox.style.color = cache[i].get("#color");
 
 
             // give id to menu
@@ -546,8 +596,10 @@ refreshPage()
     updateTotal();
 }
 
-let KEYWORDS = new Set(["#title", "#operation", "#color"]);
+let SETTINGS_STORAGE_ID = "settings-storage";
+let settings = retrieveSettings();
 
+let KEYWORDS = new Set(["#title", "#operation", "#color"]);
 let CACHE_STORAGE_ID = "cache-storage";
 let cache = retrieveCache();
 refreshPage();

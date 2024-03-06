@@ -32,6 +32,34 @@
     </head>
 
     <body>
+
+        <dialog id="settings-dialog">
+            <span class="dialog-entry">
+                <p><b>Page Title</b></p>
+                <input class="textbox" type="text" placeholder="Budget">
+            </span>
+            <span class="dialog-entry">
+                <p><b>Bottom Text</b></p>
+                <input class="textbox" type="text" placeholder="Current Balance">
+            </span>
+            <span class="dialog-entry">
+                <p><b>Background 1</b></p>
+                <input class="color-picker" type="color">
+            </span>
+            <span class="dialog-entry">
+                <p><b>Background 2</b></p>
+                <input class="color-picker" type="color">
+            </span>
+            <span class="dialog-entry">
+                <p><b>Text Color</b></p>
+                <input class="color-picker" type="color">
+            </span>
+            <span class="dialog-buttons">
+                <button class="labeled" onclick="closeDialog('settings-dialog')">Cancel</button>
+                <button class="labeled" onclick="saveSettings()">Save</button>
+            </span>
+        </dialog>
+
         <dialog id="add-section-dialog">
             <span class="dialog-entry">
                 <p><b>Title</b></p>
@@ -57,7 +85,10 @@
         </dialog>
 
         <section id="title-section">
-            <h1>Budget</h1>
+            <span>
+                <h1>Budget</h1>
+                <button class="symbolic" onclick="openSettings()">❉</button>
+            </span>
         </section>
         
         <template id="section-template">
@@ -138,7 +169,7 @@
                 </span>
                 <span class="dialog-buttons">
                     <button class="labeled">Cancel</button>
-                    <button class="labeled">Add Entry</button>
+                    <button class="labeled">Add Item</button>
                 </span>
             </dialog>
         </template>
@@ -168,8 +199,10 @@
         <button id="add-section-button" class="labeled" onclick="openDialog('add-section-dialog')">Add Section</button>
 
         <section id="current-balance-section">
-            <h2>Current Balance</h2>
-            <p id="current-balance-holder"><em id="current-balance">$0.00</em></p>
+            <span>
+                <h2>Current Balance</h2>
+                <p id="current-balance-holder"><em id="current-balance">$0.00</em></p>
+            </span>
         </section>
 
         <script src="main.js"></script>
