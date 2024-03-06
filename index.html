@@ -33,6 +33,17 @@
 
     <body>
 
+        <dialog id="confirmation-dialog">
+            <span class="dialog-entry">
+                <p><b>[Question]</b></p>
+            </span>
+            
+            <span class="dialog-buttons">
+                <button class="labeled" onclick="closeConfirmationDialog()">Cancel</button>
+                <button class="labeled">Delete</button>
+            </span>
+        </dialog>
+
         <dialog id="settings-dialog">
             <span class="dialog-entry">
                 <p><b>Page Title</b></p>
@@ -53,6 +64,18 @@
             <span class="dialog-entry">
                 <p><b>Text Color</b></p>
                 <input class="color-picker" type="color">
+            </span>
+            <span class="dialog-entry">
+                <p><b>Bar Borders</b></p>
+                <input type="checkbox" class="radio-option">
+            </span>
+            <span class="dialog-entry">
+                <p><b>Bar Shadows</b></p>
+                <input type="checkbox" class="radio-option">
+            </span>
+            <span class="dialog-entry">
+                <p><b>Bar Rounded Corners</b></p>
+                <input type="checkbox" class="radio-option">
             </span>
             <span class="dialog-buttons">
                 <button class="labeled" onclick="closeDialog('settings-dialog')">Cancel</button>

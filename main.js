@@ -80,8 +80,11 @@ retrieveCache() {
 
 function openSettings() {
     let dialog = document.getElementById("settings-dialog");
-    for(let i = 0; i < settings.length; i++) {
+    for(let i = 0; i < settings.length - 3; i++) {
         descendant(dialog, i, 1).value = settings[i];
+    }
+    for(let i = settings.length - 3; i < settings.length; i++) {
+        descendant(dialog, i, 1).checked = settings[i];
     }
     dialog.showModal();
 }
@@ -90,17 +93,25 @@ function
 retrieveSettings() 
 {
     let settingsData = localStorage.getItem(SETTINGS_STORAGE_ID);
-    if(settingsData === null) return ["Budget", "Current Balance", "#ffffff", "#ffffff", "#000000"];
+    if(settingsData === null) return ["Budget", "Current Balance", "#ffffff", "#ffffff", "#000000", false, true, true];
 
-    return settingsData.split(",");
+    let settingsArray = settingsData.split(",");
+    for(let i = settingsArray.length - 3; i < settingsArray.length; i++) {
+        settingsArray[i] = settingsArray[i] === "true";
+    }
+
+    return settingsArray;
 }
 
 function
 saveSettings()
 {
     let dialog = document.getElementById("settings-dialog");
-    for(let i = 0; i < settings.length; i++) {
+    for(let i = 0; i < settings.length - 3; i++) {
         settings[i] = descendant(dialog, i, 1).value;
+    }
+    for(let i = settings.length - 3; i < settings.length; i++) {
+        settings[i] = descendant(dialog, i, 1).checked;
     }
     localStorage.setItem(SETTINGS_STORAGE_ID, settings);
     dialog.close();
@@ -340,9 +351,47 @@ function openMenu(menuID) {
     menu.previousElementSibling.innerText = "×";
 }
 
+function openConfirmationDialog(token, i, key) {
+    closeAllMenus();
+    let dialog = document.getElementById("confirmation-dialog");
+    let question = descendant(dialog, 0, 0);
+    let deleteButton = descendant(dialog, 1, 1);
+    
+    if(token === "entry") {
+        question.innerText = "Are you sure you want to delete the following item: " + key.split("|")[0] + (key.split("|")[1].length > 0 ? " (" + key.split("|")[1] + ")" : "") +"?";
+        deleteButton.addEventListener("click", function() {
+            dialog.close();
+            removeEntry(i, key);
+        });
+
+    } else if(token === "section") {
+        question.innerText = "Are you sure you want to delete the following section: " + cache[i].get("#title") + "?";
+        deleteButton.addEventListener("click", function() {
+            dialog.close();
+            deleteSection(i);
+        });
+    }
+
+    dialog.showModal();
+    
+}
+
+function
+closeConfirmationDialog() {
+    let dialog = document.getElementById("confirmation-dialog");
+    let deleteButton = descendant(dialog, 1, 1);
+    deleteButton.replaceWith(deleteButton.cloneNode(true));
+    dialog.close();
+}
+
 function
 refreshPage()
 {
+    // refresh confirmation delete button
+    let confirmationDialog = document.getElementById("confirmation-dialog");
+    let confirmationDeleteButton = descendant(confirmationDialog, 1, 1);
+    confirmationDeleteButton.replaceWith(confirmationDeleteButton.cloneNode(true));
+
     // apply page settings
     let titleSection = document.getElementById("title-section");
     descendant(titleSection, 0, 0).innerText = settings[0];
@@ -354,8 +403,29 @@ refreshPage()
     titleSection.style.color = settings[4];
     bottomSection.style.color = settings[4];
 
-    titleSection.style["border-bottom"] = "2px solid " + settings[4];
-    bottomSection.style["border-top"]  = "2px solid " + settings[4];
+    if(settings[5]) {
+        titleSection.style["border-bottom"] = "2px solid " + settings[4];
+        bottomSection.style["border-top"]  = "2px solid " + settings[4];
+    } else {
+        titleSection.style["border-bottom"] = "none";
+        bottomSection.style["border-top"]  = "none";
+    }
+
+    if(settings[6]) {
+        titleSection.style["box-shadow"] = "0 0 1rem rgba(0, 0, 0, 0.4)";
+        bottomSection.style["box-shadow"] = "0 0 1rem rgba(0, 0, 0, 0.4)";
+    } else {
+        titleSection.style["box-shadow"] = "none";
+        bottomSection.style["box-shadow"] = "none";
+    }
+
+    if(settings[7]) {
+        titleSection.style.borderRadius = "0rem 0rem 1rem 1rem";
+        bottomSection.style.borderRadius = "1rem 1rem 0rem 0rem";
+    } else {
+        titleSection.style.borderRadius = "0";
+        bottomSection.style.borderRadius = "0";
+    }
 
     let addSectionButton = document.getElementById("add-section-button");
     addSectionButton.style.border = "2px solid " + settings[4];
@@ -508,7 +578,8 @@ refreshPage()
 
         let sectionMenuDeleteButton = descendant(sectionMenu, 2);
         sectionMenuDeleteButton.addEventListener("click", function() {
-            deleteSection(i);
+            // deleteSection(i);
+            openConfirmationDialog("section", i);
         });
 
         // cancel button in dialog
@@ -575,7 +646,8 @@ refreshPage()
 
             let menuDeleteButton = descendant(entrySpan, 1, 2, 1);
             menuDeleteButton.addEventListener("click", function() {
-                removeEntry(i, key);
+                // removeEntry(i, key);
+                openConfirmationDialog("entry", i, key);
             });
 
             let editEntryDialogCancelButton = descendant(editEntryDialog, 2, 0);
@@ -603,3 +675,4 @@ let KEYWORDS = new Set(["#title", "#operation", "#color"]);
 let CACHE_STORAGE_ID = "cache-storage";
 let cache = retrieveCache();
 refreshPage();
+
