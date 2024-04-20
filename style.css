@@ -258,7 +258,7 @@ span.radio > label {
 .menu {
     position: absolute;
     z-index: 1000;
-    top: -1.8rem;
+    top: -0.25rem;
     right: 3rem;
     border-radius: 0.25rem;
     width: 10rem;

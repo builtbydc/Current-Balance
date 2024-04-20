@@ -319,6 +319,86 @@ deleteSection(i)
 }
 
 function
+moveUp(token, i, targetKey) {
+    if(token === "entry") {
+
+        let newSectionData = new Map();
+        let j = 0; // key number
+        let previousKey = "";
+        for(let key of cache[i].keys()) {
+
+            if(KEYWORDS.has(key)) {
+
+                newSectionData.set(key, cache[i].get(key));
+                continue;
+                // not an entry
+            }
+
+            if(key === targetKey) {
+                if(j === 0) {
+                    refreshPage();
+                    return;
+                }
+                let previousKeyValue = cache[i].get(previousKey);
+                newSectionData.delete(previousKey);
+                newSectionData.set(key, cache[i].get(key));
+                newSectionData.set(previousKey, previousKeyValue);
+
+            } else {
+                newSectionData.set(key, cache[i].get(key));
+            }
+
+            previousKey = key;
+            j++;
+        }
+        cache[i] = newSectionData;
+    } else if(token === "section") {
+        if(i === 0) {
+            refreshPage();
+            return;
+        }
+
+        let tempSectionData = cache[i-1];
+        cache[i-1] = cache[i];
+        cache[i] = tempSectionData;
+    }
+
+    saveCache();
+    refreshPage();
+}
+
+function
+moveDown(token, i, targetKey) {
+    if(token === "entry") {
+        let foundFlag = false;
+        for(let key of cache[i].keys()) {
+            if(KEYWORDS.has(key)) {
+                continue;
+            }
+
+            if(foundFlag) {
+                moveUp("entry", i, key);
+                foundFlag = false;
+                break;
+            }
+
+            if(key === targetKey) {
+                foundFlag = true;
+            }
+        }
+        if(foundFlag) {
+            refreshPage();
+        }
+    } else if(token === "section") {
+        if(i === cache.length - 1) {
+            refreshPage();
+            return;
+        }
+        moveUp("section", i+1);
+    }
+}
+
+function
 closeAllMenus() {
     let content = document.getElementById("content");
     for(let i = 0; i < cache.length; i++) {
@@ -594,6 +674,17 @@ refreshPage()
             addEntry(i, addEntryDialogID);
         });
 
+        let sectionMenuMoveUpButton = descendant(sectionMenu, 3);
+        sectionMenuMoveUpButton.addEventListener("click", function() {
+            moveUp("section", i);
+        });
+
+        let sectionMenuMoveDownButton = descendant(sectionMenu, 4);
+        sectionMenuMoveDownButton.addEventListener("click", function() {
+            moveDown("section", i);     
+        });
+
+
         // inner loop: loop over entries
         let j = 0; // key number
         for(let key of cache[i].keys()) {
@@ -649,6 +740,16 @@ refreshPage()
                 // removeEntry(i, key);
                 openConfirmationDialog("entry", i, key);
             });
+
+            let menuMoveUpButton = descendant(entrySpan, 1, 2, 2);
+            menuMoveUpButton.addEventListener("click", function() {
+                moveUp("entry", i, key);
+            });
+
+            let menuMoveDownButton = descendant(entrySpan, 1, 2, 3);
+            menuMoveDownButton.addEventListener("click", function() {
+                moveDown("entry", i, key);
+            })
 
             let editEntryDialogCancelButton = descendant(editEntryDialog, 2, 0);
             editEntryDialogCancelButton.addEventListener("click", function() {
